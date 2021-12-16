@@ -1,0 +1,10 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea
+*.iml
+out
+gen
+test1.py
+test2.py
+UI_tk.py
+UI2.py
+UI3.py

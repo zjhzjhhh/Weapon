@@ -1,4 +1,4 @@
-from tkinter import filedialog
+from tkinter import filedialog, Toplevel, ttk
 
 
 def webcrack_ui():
