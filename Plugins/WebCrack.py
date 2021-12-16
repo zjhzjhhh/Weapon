@@ -17,13 +17,13 @@ def webcrack_ui():
     c.place(relx = 0.820,rely =0.22,relwidth = 0.140,relheight = 0.25)
 
 
-def webcrack_file():
-    e1.delete(0, 'end')
-    filePath = filedialog.askopenfilename()
-    e1.insert("end", filePath + '\n')
-    webcrack_execution()
-
-
-def webcrack_execution():
-    cmd = "start " + python_os + " FUNCTION/WebCrack/webcrack.py -f {}".format(e1.get().strip())
-    os.system(cmd)
+# def webcrack_file():
+#     e1.delete(0, 'end')
+#     filePath = filedialog.askopenfilename()
+#     e1.insert("end", filePath + '\n')
+#     webcrack_execution()
+#
+#
+# def webcrack_execution():
+#     cmd = "start " + python_os + " FUNCTION/WebCrack/webcrack.py -f {}".format(e1.get().strip())
+#     os.system(cmd)
