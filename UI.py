@@ -18,6 +18,10 @@ def login_ui():
     global tree
     global Label_2
     global Entry_1
+    global num
+    global item_text
+    global stop_run
+    global h1
 
     # cf = configparser.ConfigParser()
     # cf.read("./iniFile/config.ini")
@@ -25,17 +29,25 @@ def login_ui():
     # email = cf.get('fofa api', 'EMAIL')
     # key = cf.get('fofa api', 'KEY')
 
+    item_text = []
+    num = 1
+    stop_run = False
+
     window = tk.Tk()
+
     window.title('Weapon by zjhzjhhh v1.0 ')
     window.geometry('1350x700+350+150')
 
-    menbar = tk.Menu(window)
-
-    menbar.add_command(label="ICON")#, command=ICON.create()
-    menbar.add_command(label="IP反查")#, command=IP138.IP138_search()
+    menbar = tk.Menu(window,tearoff=0)
+    menbar.add_command(label="ICON", command=ICON.create)#, command=ICON.create()
+    menbar.add_command(label="IP反查", command=IP138.IP138_search)#, command=IP138.IP138_search()
     menbar.add_command(label="弱口令检测")#, command=
 
     window.config(menu = menbar)
+
+    h1 = tk.IntVar()
+    Checkbutton_1 = ttk.Checkbutton(window, text="排除干扰", variable=h1, offvalue=0,command=interfere)
+    Checkbutton_1.place(relx=0.040, rely=0.089, relwidth=0.090, relheight=0.040)
 
     Label_1 = ttk.Label(window, text="FOFA语法", font=("黑体", 11))
     Label_1.place(relx=0.020, rely=0.030, relwidth=0.100, relheight=0.050)
@@ -60,15 +72,13 @@ def login_ui():
 
     style = Style(theme="yeti")
     print(style.theme_names())
-    style.theme_create("st_app", parent="vista", settings={
-        ".": {"configure": {"background": "SystemButtonFace", "foreground": 'SystemWindowText',
-                            "selectbackground": "SystemHighlightText", "selectforeground": "SystemHighlight",
-                            "insertcolor": "SystemWindowText", "font": "TkDefaultFont"}},
-        "Treeview": {"configure": {}, "map": {"background": [("selected", "SystemHighlight")]}},
-        "TCombobox": {"configure": {"padding": "1"}},
-        "TButton": {"configure": {"anchor": "center", "padding": 1, "font": ("宋体", 10)}},
-        "TCheckbutton": {"configure": {"padding": 2, "font": ("宋体", 11)}}
-    })
+    style.theme_create( "st_app", parent="vista",settings={
+        ".":{"configure":{"background":"SystemButtonFace","foreground": 'SystemWindowText',"selectbackground":"SystemHighlightText","selectforeground":"SystemHighlight","insertcolor":"SystemWindowText","font":"TkDefaultFont"}},
+        "Treeview":{"configure":{},"map":{"background":[("selected","SystemHighlight")]}},
+        "TCombobox":{"configure":{"padding":"1"}},
+        "TButton":{"configure":{"anchor":"center","padding":1,"font":("宋体",10)}},
+        "TCheckbutton":{"configure":{"padding":2,"font":("宋体",11)}}
+        })
     style.theme_use("st_app")
     style.configure('Treeview.Heading', font=("黑体", 10), foreground='black')
     style.configure('Treeview', font=("宋体", 10))
@@ -173,9 +183,16 @@ def gourl(event):
     for item in tree.selection():
         item_text = tree.item(item,"values")
         webbrowser.open(item_text[1])
+
 def on_closing():
     os._exit(0)
 
+##排除干扰
+def interfere():
+    if h1.get()==0:
+        h1.set(1)
+    elif h1.get() ==1:
+        h1.set(0)
 
 if __name__ == '__main__':
     login_ui()

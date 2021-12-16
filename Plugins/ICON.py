@@ -1,7 +1,8 @@
-from tkinter import Toplevel, ttk
-import requests
 import base64
+from tkinter import Toplevel, ttk
+
 import mmh3
+import requests
 
 
 def create():
