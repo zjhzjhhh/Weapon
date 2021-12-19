@@ -3,17 +3,16 @@ import configparser
 import csv
 import json
 import os
-import queue
+import threading
 import tkinter as tk
 import webbrowser
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, filedialog
 
-import pyperclip
 import requests
-from github import Github
 from ttkbootstrap import Style
 
-from Plugins import ICON, IP138
+from Function import display_messagebox2, copyURL, copyIP, new_num
+from Plugins import ICON, IP138, Google, WebCrack
 
 
 def login_ui():
@@ -48,8 +47,11 @@ def login_ui():
     menbar = tk.Menu(window,tearoff=0)
     menbar.add_command(label="ICON", command=ICON.create)#, command=ICON.create()
     menbar.add_command(label="IP反查", command=IP138.IP138_search)#, command=IP138.IP138_search()
-    menbar.add_command(label="弱口令检测")#, command=
-    menbar.add_command(label="Google")
+    menbar.add_command(label="弱口令检测", command=WebCrack.webcrack_ui)#, command=
+    menbar.add_command(label="Google", command=Google_search)
+    menbar.add_command(label="WeChat")
+    menbar.add_command(label="Xray被动扫描")
+
 
 
     window.config(menu = menbar)
@@ -83,7 +85,7 @@ def login_ui():
     Button_1 = ttk.Button(window,text="Query", command=choose)#, command=fofa
     Button_1.place(relx = 0.845,rely =0.02,relwidth = 0.060,relheight = 0.11)
 
-    Button_2 = ttk.Button(window, text="Stop")#, command=stop
+    Button_2 = ttk.Button(window, text="Stop", command=stop)#, command=stop
     Button_2.place(relx = 0.920,rely=0.02,relwidth = 0.060,relheight = 0.05)
 
     Button_3 = ttk.Button(window, text="Export", command=save)#, command=save
@@ -131,8 +133,7 @@ def login_ui():
     menu.add_command(label="复制URL", command=copyURL)#, command=copyURL
     menu.add_command(label="复制IP", command=copyIP)#, command=copyIP
     #menu.add_command(label="复制备份")#, command=copybackup
-    menu.add_command(label="Github搜集",command=Github_Search)
-    #menu.add_command(label="Google搜集")
+    menu.add_command(label="Github搜集")
 
     tree.bind('<Double-Button-1>',gourl)
     tree.place(relx = 0.020,rely =0.140,relwidth = 0.950,relheight =0.800)
@@ -218,7 +219,66 @@ def fofa():
     Label_2.config(text="扫描任务已结束")
 # time.sleep(60)
 
+def Google_search():
+    global proxies
+    global e1
+    global e2
+    global search
+    global page
 
+    cf = configparser.ConfigParser()
+    cf.read("./config/config.ini")
+    p = cf.get("google proxy", "proxy")
+    proxies = {'http': "socks5://{}".format(p), 'https': "socks5://{}".format(p)}
+    print(proxies)
+
+    top = tk.Toplevel()
+    top.title('google search')
+    top.wm_attributes("-topmost", 1)
+    top.geometry("400x150+550+250")
+    top.resizable(width=False, height=False)
+    L1 = ttk.Label(top, text="关键字", font=("宋体", 9))
+    L1.place(relx=0.020, rely=0.030, relwidth=0.30, relheight=0.30)
+    e1 = ttk.Entry(top)
+    e1.place(relx=0.2, rely=0.10, relwidth=0.600, relheight=0.2)
+    L2 = ttk.Label(top, text="数量", font=("宋体", 9))
+    L2.place(relx=0.020, rely=0.4, relwidth=0.3, relheight=0.20)
+    e2 = ttk.Entry(top)
+    e2.place(relx=0.2, rely=0.40, relwidth=0.600, relheight=0.2)
+    b = ttk.Button(top, text="查询", command=find1)
+    b.place(relx=0.820, rely=0.090, relwidth=0.140, relheight=0.20)
+    L2 = ttk.Label(top, text="提醒:多个关键字可以用+连接,结果自动保存在out目录下", font=("宋体", 9))
+    L2.place(relx=0.020, rely=0.6, relwidth=0.9, relheight=0.20)
+
+def find1():
+    new_num()
+    tree.heading('1',text="序号")
+    tree.heading('2',text='URL')
+    tree.column('1',width=150,anchor='center')
+    tree.column('2',width=1200,anchor='center')
+    search=e1.get()
+    page=int(e2.get())
+    google_hacker(search,page)
+
+
+def aswync(f):
+    def wrapper(*args, **kwargs):
+        thr = threading.Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
+
+
+@aswync
+def google_hacker(search,page):
+    x=tree.get_children()
+    for item in x:
+        tree.delete(item)
+    lists= Google.search(search, num_results=page, proxy=proxies)
+    for i in lists:
+        print(i)
+        update_result(i,"","","","","","")
+        with open(r"out/google_hack.txt", "a+") as f:
+            f.write(i+'\n')
 
 def result(host,title,ip,port,domain,server,backup=None):
     global num
@@ -265,106 +325,11 @@ def save():
         li.append(row['values'])
     winter.writerows(li)
 
+def stop():
+    global stop_run
+    stop_run=True
+    Label_2.config(text="正在终止线程...")
 
-def display_messagebox2():
-	messagebox.showinfo(title='提示',
-		message='需要选择功能')
-
-def copyIP():
-    global item_text
-    pyperclip.copy(item_text[2])
-
-def copyURL():
-    global item_text
-    pyperclip.copy(item_text[1])
-
-def Github_Search():
-    global num
-    num = 1
-    global e1
-    global top
-    top = tk.Toplevel()
-    top.title('github搜索')
-    top.wm_attributes("-topmost",1)
-    top.geometry("400x100+550+250")
-    top.resizable(width=False, height=False)
-    L1=ttk.Label(top,text="关键字:",font=("宋体",9))
-    L1.place(relx = 0.020,rely =0.180,relwidth =0.30,relheight = 0.30)
-    e1=ttk.Entry(top)
-    e1.place(relx = 0.2,rely =0.25,relwidth = 0.600,relheight = 0.2)
-    c=ttk.Button(top,text="搜索",command=Github_Search_Gui)
-    c.place(relx = 0.820,rely =0.22,relwidth = 0.140,relheight = 0.25)
-
-def Github_Search_Gui():
-    cf = configparser.ConfigParser()
-    cf.read("./config/config.ini")
-    github_token = cf.get('github api', 'GITHUB_TOKEN')
-
-
-
-    x=tree.get_children()
-    for item in x:
-        tree.delete(item)
-    tree.heading('1',text="序号")
-    tree.heading('2',text='URL')
-    tree.heading('3',text='关键字')
-    tree.heading('4',text="误报")
-    tree.column('1',width=150,anchor='center')
-    tree.column('2',width=720,anchor='center')
-    tree.column('3',width=200,anchor='center')
-    tree.column('4',width=200,anchor='center')
-    query=e1.get()
-    hosts=query.split(',')
-    for i in range(0,len(hosts)):
-        hosts.append(hosts[i]+" @")
-    print(hosts)
-    keywords=GenerateKeywords(hosts)
-    github_test=Github(github_token)
-    for key in keywords:
-        result=github_test.search_code(
-            key,
-            sort="indexed",
-            order="desc",
-        )
-        analysis_page(result,key)
-def analysis_page(result,key):
-    page_id=0
-    while page_id < 34:
-        try:
-            iteks=result.get_page(page_id)
-            ana_result=analysis_result(iteks,key)
-            if not ana_result:
-                print("[WARNING] 在第{}页退出".format(page_id))
-                break
-        except Exception as e:
-            print(e)
-    page_id+=1
-    print("[INFO] 结束关键字: " + key + "\n\n")
-
-
-def analysis_result(items, key):
-    result_id = 0
-    result_count = len(items)
-
-    if not result_count:
-        result("目标为空", key, "", "", "", "")
-        return None
-
-    while result_id < result_count:
-        item = items[result_id]
-        try:
-            if all(list([kw in item.decoded_content.decode("utf8") for kw in key.split(" ")])):
-                negative = "疑似"
-            else:
-                negative = "False"
-            url = "https://www.github.com/" + \
-                  item.repository.full_name + "/blob/master/" + item.path
-            print(url)
-            update_result(url, key, negative, "", "", "")
-
-        except Exception as e:
-            print(e)
-        result_id += 1
 def update_result(host,title,ip,port,domain,server,backup=None,Fingerprint=None):
     global num
     li=[num,host,title,ip,port,domain,server,backup,Fingerprint]
@@ -375,18 +340,9 @@ def update_result(host,title,ip,port,domain,server,backup=None,Fingerprint=None)
     else:
         tree.insert('', 'end', values=li)
         tree.update()
-def GenerateKeywords(hosts):
-    key = ['jdbc:', 'password', 'username', 'database', 'smtp', 'vpn', 'pwd', 'passwd', 'connect', "密码"]
-    keywords = []
 
-    for h in hosts:
-        if "@" in h:
-            h = h.split("@")[0] + " smtp"
 
-        for k in key:
-            keywords.append(h + " " + k)
 
-    return keywords
 if __name__ == '__main__':
     login_ui()
 

@@ -36,6 +36,6 @@ def on_closing():
 
 
 
-# def new_num():
-#     global num
-#     num = 1
+def new_num():
+    global num
+    num = 1

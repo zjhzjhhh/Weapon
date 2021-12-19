@@ -1,24 +1,25 @@
-from random import random
+import time
 
 from bs4 import BeautifulSoup
 from requests import get
 
-from config import UserHeader
-
 
 def search(term, num_results=10, lang="en", proxy=None):
     usr_agent = {
-        "User-Agent": random.choice(UserHeader.USER_Header)
-}
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/61.0.3163.100 Safari/537.36'}
 
     def fetch_results(search_term, number_results, language_code):
         escaped_search_term = search_term.replace(' ', '+')
 
-        google_url = 'https://www.google.com/search?q={}&num={}&hl={}'.format(escaped_search_term, number_results+1, language_code)
-        proxies = proxy
+        google_url = 'https://www.google.com/search?q={}&num={}&hl={}'.format(escaped_search_term, number_results+1,
+                                                                              language_code)
+        proxies=proxy
         print(proxies)
         response = get(google_url, headers=usr_agent, proxies=proxies)
+        time.sleep(10)
         response.raise_for_status()
+
         return response.text
 
     def parse_results(raw_html):
@@ -32,5 +33,3 @@ def search(term, num_results=10, lang="en", proxy=None):
 
     html = fetch_results(term, num_results, lang)
     return list(parse_results(html))
-
-
