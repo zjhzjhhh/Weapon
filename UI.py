@@ -46,6 +46,7 @@ def login_ui():
 
     window = tk.Tk()
 
+    window.iconbitmap("world.ico")
     window.title('Weapon by zjhzjhhh v1.0 ')
     window.geometry('1350x700+350+150')
 
