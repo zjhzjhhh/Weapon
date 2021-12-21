@@ -197,7 +197,7 @@ def fofaRun():
 
     proxies = {'http': None, 'https': None}
     cf = configparser.ConfigParser()
-    cf.read("./config/config.ini")
+    cf.read("./config/conf.ini")
     fofa_email = cf.get('fofa api', 'EMAIL')
     fofa_key = cf.get('fofa api', 'KEY')
 
@@ -234,7 +234,7 @@ def fofa():
 
     proxies = {'http': None, 'https': None}
     cf = configparser.ConfigParser()
-    cf.read("./config/config.ini")
+    cf.read("./config/conf.ini")
     fofa_email = cf.get('fofa api', 'EMAIL')
     fofa_key = cf.get('fofa api', 'KEY')
 
