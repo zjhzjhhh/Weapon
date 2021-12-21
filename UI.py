@@ -414,7 +414,3 @@ def update_result(host,title,ip,port,domain,server,backup=None,Fingerprint=None)
         tree.update()
 
 
-
-if __name__ == '__main__':
-    login_ui()
-
